@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-SHIRTXZ</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@500;700&family=Manrope:wght@800&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#080C16;--card:#121722;--border:#1E253A;--muted:#6B7190}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter}
+body{background:var(--bg);color:#fff}
+.wrap{max-width:420px;margin:0 auto}
+.tabs{display:flex;gap:8px;padding:14px 20px 0}
+.tab{flex:1;padding:12px;border-radius:14px;background:var(--card);border:1px solid var(--border);text-align:center;font-size:12px;font-weight:700;color:var(--muted);cursor:pointer}
+.tab.active{background:#fff;color:#000}
+.card{margin:12px 20px 0;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:12px}
+.input{display:flex;gap:8px;background:#0E1320;border:1px solid var(--border);border-radius:14px;padding:5px}
+.input input{flex:1;background:transparent;border:none;color:#fff;outline:none;padding:10px;font-size:13px}
+.input button{background:#fff;color:#000;border:none;border-radius:10px;padding:10px 14px;font-weight:700;font-size:12px}
+.tools{display:flex;gap:6px;margin-top:10px;overflow-x:auto;white-space:nowrap;scrollbar-width:none}
+.tools::-webkit-scrollbar{display:none}
+.tbtn{padding:7px 12px;border-radius:100px;background:#191E2E;border:1px solid var(--border);font-size:11px;font-weight:600;color:var(--muted);cursor:pointer;flex-shrink:0}
+.tbtn.active{background:#fff;color:#000;border-color:#fff}
+.chart{margin-top:10px;border-radius:16px;overflow:hidden;border:1px solid var(--border);background:#0A0F1C}
+.viewport{overflow:hidden}.slider{display:flex;width:200%;transition:.3s}.page{width:50%;flex-shrink:0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="tabs">
+<div class="tab active" id="t1" onclick="go(0)">TikTok</div>
+<div class="tab" id="t2" onclick="go(1)">Instagram</div>
+</div>
+
+<div class="viewport" id="vp"><div class="slider" id="slider">
+
+<!-- BILAH 1 -->
+<div class="page">
+<div class="card">
+<div class="input"><input id="ttUrl" placeholder="Paste link"><button onclick="dl('tt')">Get</button></div>
+<div id="ttRes" style="display:none;margin-top:10px;border-radius:16px;overflow:hidden;background:#0A0F1C"></div>
+</div>
+<div class="card">
+<div class="input"><input id="q1" placeholder="BTC, ETH, GOLD"><button onclick="searchM('q1','tv1')">Cari</button></div>
+<div class="tools" id="tools1">
+<span class="tbtn active" onclick="setStudy('tv1','',this)">Clean</span>
+<span class="tbtn" onclick="setStudy('tv1','MASimple@tv-basicstudies',this)">MA</span>
+<span class="tbtn" onclick="setStudy('tv1','RSI@tv-basicstudies',this)">RSI</span>
+<span class="tbtn" onclick="setStudy('tv1','MACD@tv-basicstudies',this)">MACD</span>
+<span class="tbtn" onclick="setStudy('tv1','Volume@tv-basicstudies',this)">Vol</span>
+<span class="tbtn" onclick="setStudy('tv1','BB@tv-basicstudies',this)">BB</span>
+</div>
+<div class="chart"><iframe id="tv1" style="width:100%;height:380px;border:none" src="https://s.tradingview.com/widgetembed/?symbol=BINANCE:BTCUSDT&interval=60&theme=dark&style=3"></iframe></div>
+</div>
+</div>
+
+<!-- BILAH 2 -->
+<div class="page">
+<div class="card">
+<div class="input"><input id="igUrl" placeholder="Paste link"><button onclick="dl('ig')">Get</button></div>
+<div id="igRes" style="display:none;margin-top:10px;border-radius:16px;overflow:hidden;background:#0A0F1C"></div>
+</div>
+<div class="card">
+<div class="input"><input id="q2" value="IHSG"><button onclick="searchM('q2','tv2')">Cari</button></div>
+<div class="tools" id="tools2">
+<span class="tbtn active" onclick="setStudy('tv2','',this)">Clean</span>
+<span class="tbtn" onclick="setStudy('tv2','MASimple@tv-basicstudies',this)">MA</span>
+<span class="tbtn" onclick="setStudy('tv2','RSI@tv-basicstudies',this)">RSI</span>
+<span class="tbtn" onclick="setStudy('tv2','MACD@tv-basicstudies',this)">MACD</span>
+<span class="tbtn" onclick="setStudy('tv2','Volume@tv-basicstudies',this)">Vol</span>
+</div>
+<div class="chart"><iframe id="tv2" style="width:100%;height:380px;border:none" src="https://s.tradingview.com/widgetembed/?symbol=IDX:COMPOSITE&interval=D&theme=dark&style=3"></iframe></div>
+</div>
+</div>
+
+</div></div>
+</div>
+
+<script>
+const CFG={
+ 'BTC':{tv:'BINANCE:BTCUSDT',i:'60'},
+ 'ETH':{tv:'BINANCE:ETHUSDT',i:'60'},
+ 'GOLD':{tv:'TVC:GOLD',i:'60'},
+ 'IHSG':{tv:'IDX:COMPOSITE',i:'D'},
+ 'BBCA':{tv:'IDX:BBCA',i:'D'},
+ 'USD/IDR':{tv:'FX_IDC:USDIDR',i:'60'},
+ 'AAPL':{tv:'NASDAQ:AAPL',i:'60'}
+};
+let currentStudies={tv1:'',tv2:''};
+let currentSymbol={tv1:'BINANCE:BTCUSDT',tv2:'IDX:COMPOSITE'};
+let currentInterval={tv1:'60',tv2:'D'};
+
+function go(n){
+ document.getElementById('slider').style.transform=`translateX(-${n*50}%)`;
+ document.getElementById('t1').classList.toggle('active',n==0);
+ document.getElementById('t2').classList.toggle('active',n==1);
+}
+let sx=0;
+document.getElementById('vp').addEventListener('touchstart',e=>sx=e.touches[0].clientX);
+document.getElementById('vp').addEventListener('touchend',e=>{
+ const d=e.changedTouches[0].clientX-sx;
+ if(d<-50) go(1); if(d>50) go(0);
+});
+
+function setStudy(tvId, study, el){
+ currentStudies[tvId]=study;
+ // update active button
+ const parent = el.parentElement;
+ parent.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('active'));
+ el.classList.add('active');
+ reloadChart(tvId);
+}
+
+function reloadChart(tvId){
+ const tv=document.getElementById(tvId);
+ const sym=currentSymbol[tvId];
+ const interval=currentInterval[tvId];
+ const study=currentStudies[tvId];
+ let src=`https://s.tradingview.com/widgetembed/?symbol=${sym}&interval=${interval}&theme=dark&style=3&hide_legend=0`;
+ if(study) src+=`&studies=${encodeURIComponent('["'+study+'"]')}`;
+ tv.src=src;
+}
+
+function searchM(qId,tvId){
+ const q=document.getElementById(qId).value.trim().toUpperCase();
+ const c=CFG[q]; if(!c) return;
+ currentSymbol[tvId]=c.tv;
+ currentInterval[tvId]=c.i;
+ reloadChart(tvId);
+}
+
+async function dl(t){
+ const id=t=='tt'?'ttUrl':'igUrl', rid=t=='tt'?'ttRes':'igRes';
+ const url=document.getElementById(id).value.trim();
+ const box=document.getElementById(rid);
+ if(!url) return;
+ box.style.display='block';
+ box.innerHTML='<div style="padding:20px;text-align:center;color:var(--muted);font-size:12px">Loading...</div>';
+ try{
+  const r=await fetch(`https://www.tikwm.com/api/?url=${encodeURIComponent(url)}`).then(a=>a.json());
+  if(r.code==0){
+   box.innerHTML=`<video controls src="${r.data.play}" style="width:100%;display:block"></video><div style="padding:10px;display:flex;justify-content:flex-end"><a href="${r.data.play}" target="_blank" style="background:#fff;color:#000;padding:8px 14px;border-radius:100px;text-decoration:none;font-weight:700;font-size:11px">Download</a></div>`;
+  }
+ }catch(e){}
+}
+</script>
+</body>
+</html>
